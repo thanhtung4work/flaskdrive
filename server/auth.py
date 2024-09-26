@@ -11,49 +11,48 @@ from server.db import get_db
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 
-@bp.route('/register', methods=['POST'])
+@bp.route('/register', methods=['GET', 'POST'])
 def register():
-    data = request.get_json(force=True)
+    if request.method == 'GET':
+        return render_template('auth/register.html')
+    
+    data = request.form
     
     username = data.get('username', None)
     password = data.get('password', None)
     db = get_db()
 
+    error = None
+
     if not username:
         error = 'username is required'
-        return {
-            'message': error
-        }, 500
     if not password:
         error = 'password is required'
-        return {
-            'message': error
-        }, 500
     
-    try:
-        db.execute(
-            "INSERT INTO user (username, password) VALUES (?, ?)",
-            (username, generate_password_hash(password))
-        )
-        db.commit()
-        user_folder = os.path.join('server', 'static', current_app.config['ROOT_DIR'], username)
-        os.mkdir(user_folder)
-    except Exception as er:
-        error = f"User {username} is already registered."
-        print(er)
-        print(os.path.abspath(os.path.curdir))
-        return {
-            'message': error
-        }, 500
-
-    return {
-        'message': 'registeration successfull'
-    }
+    if error is None:
+        try:
+            db.execute(
+                'INSERT INTO user (username, password) VALUES (?, ?)',
+                (username, generate_password_hash(password))
+            )
+            db.commit()
+            user_folder = os.path.join('server', 'static', current_app.config['ROOT_DIR'], username)
+            os.mkdir(user_folder)
+        except Exception as er:
+            error = f'User {username} is already registered.'
+        else:
+            return redirect(url_for("auth.login"))
+    
+    flash(error)
+    return render_template('auth/register.html')
 
 
-@bp.route('login', methods=['POST'])
+@bp.route('login', methods=['GET', 'POST'])
 def login():
-    data = request.get_json(force=True)
+    if request.method == 'GET': 
+        return render_template('auth/login.html')
+    
+    data = request.form
     
     username = data.get('username', None)
     password = data.get('password', None)
@@ -72,9 +71,10 @@ def login():
     if error is None:
         session.clear()
         session['user_id'] = user['id']
-        return {'message': 'login successful'}, 200
+        return redirect(url_for('files.index'))
     
-    return {'message': error}, 500
+    flash(error)
+    return render_template('auth/login.html')
 
 
 @bp.before_app_request
@@ -93,13 +93,13 @@ def login_required(view):
     @functools.wraps(view)
     def wrapped_view(**kwargs):
         if g.user is None:
-            return {'message': 'login required'}
+            return redirect(url_for('auth.login'))
         return view(**kwargs)
     return wrapped_view
 
 
-@bp.route('logout', methods=['POST'])
+@bp.route('logout', methods=['POST', 'GET'])
 @login_required
 def logout():
     session.clear()
-    return {'message': 'logout'}, 200
+    return redirect(url_for('auth.login'))

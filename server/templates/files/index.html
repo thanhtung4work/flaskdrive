@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Your files{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+    <form action="/files/upload" method="post" enctype="multipart/form-data">
+        <label for="file-upload">file to upload</label>
+        <input name="file-upload" id="file-upload" required type="file">
+        <input type="submit">
+    </form>
+
+    <form action="/files/search" method="post">
+        <label for="query">search</label>
+        <input name="query" id="query" required type="text">
+        <input type="submit">
+    </form>
+    {% for file in data %}
+    <p>
+        {{file}}
+        <a href="/files/delete/{{file}}">delete</a>
+        <a href="/files/summary/{{file}}">summary</a>
+    </p>
+    {% endfor %}
+{% endblock %}

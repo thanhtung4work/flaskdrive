@@ -17,36 +17,53 @@ def get_user_folder():
 @bp.route('/')
 @login_required
 def index():
-    return {"files": os.listdir(get_user_folder())}
+    files = os.listdir(get_user_folder())
+    return render_template('files/index.html', data=files)
 
 @bp.route('/upload', methods=['POST'])
 @login_required
 def upload():
-    file = request.files['file']
+    file = request.files['file-upload']
     user_dir = get_user_folder()
     if os.path.exists(user_dir):
         file.save(os.path.join(user_dir, file.filename))
-        return {'message': "file uploaded"}, 200
-    return {'message': 'upload failed'}, 500
+        return redirect(url_for('files.index'))
+    flash('upload failed')
+    return redirect(url_for('files.index'))
 
 
-@bp.route('/delete/<filename>', methods=['POST'])
+@bp.route('/delete/<filename>', methods=['POST', 'GET'])
 @login_required
 def delete(filename):
     if os.path.exists(
         os.path.join(get_user_folder(), filename)
     ):
         os.remove(os.path.join(get_user_folder(), filename))
-        return {'message': 'file deleted'}, 200
-    return {'message': 'file not found'}, 404
+        return redirect(url_for('files.index'))
+    flash('cannot delete file, try later')
+    return redirect(url_for('files.index'))
 
 
-@bp.route('/search/<query>', methods=['POST'])
+@bp.route('/summary/<filename>', methods=['GET', 'POST'])
 @login_required
-def search(query):
+def summary(filename):
+    if os.path.exists(
+        os.path.join(get_user_folder(), filename)
+    ):
+        flash('summary content go here')
+        return redirect(url_for('files.index'))
+    flash('cannot summary')
+    return redirect(url_for('files.index'))
+
+
+@bp.route('/search', methods=['POST'])
+@login_required
+def search():
+    data = request.form
+
     results = []
     for file in os.listdir(get_user_folder()):
-        if query in file:
+        if data['query'] in file:
             results.append(file)
     
-    return {"files": results}, 200
+    return render_template("files/index.html", data=results)
