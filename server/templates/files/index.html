@@ -1,26 +1,64 @@
 {% extends 'base.html' %}
 
 {% block header %}
-  <h1>{% block title %}Your files{% endblock %}</h1>
+  <h4>file management</h4>
 {% endblock %}
 
 {% block content %}
-    <form action="/files/upload" method="post" enctype="multipart/form-data">
-        <label for="file-upload">file to upload</label>
-        <input name="file-upload" id="file-upload" required type="file">
-        <input type="submit">
-    </form>
+    <ul class="accordion" data-accordion>
+        <li class="accordion-item is-active" data-accordion-item>
+            <a href="#" class="accordion-title">Accordion 1</a>
+            <div class="accordion-content" data-tab-content>
+                <form action="/files/upload" method="post" enctype="multipart/form-data">
+                    <label for="file-upload">file to upload</label>
+                    <input name="file-upload" id="file-upload" required type="file">
+                    <input type="submit" class="button">
+                </form>
+            </div>
+        </li>
+        <li class="accordion-item" data-accordion-item>
+            <a href="#" class="accordion-title">Accordion 2</a>
+            <div class="accordion-content" data-tab-content>
+                <form action="/files/search" method="post">
+                    <label for="query">search file</label>
+                    <input name="query" id="query" required type="text">
+                    <input type="submit" class="button">
+                </form>
+            </div>
+        </li>
+    </ul>
+    
+    <table class="u-full-width">
+        <thead>
+            <tr>
+                <th>Files</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for file in data %}
+            <tr>
+                <td>{{file}}</td>
+                <td class="">
+                    <a href="/files/delete/{{file}}" class="button">delete</a>
+                    <a href="/files/summary/{{file}}" class="button">summary</a>
+                    <button class="button" data-open="rename-modal">rename</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
-    <form action="/files/search" method="post">
-        <label for="query">search</label>
-        <input name="query" id="query" required type="text">
-        <input type="submit">
-    </form>
-    {% for file in data %}
-    <p>
-        {{file}}
-        <a href="/files/delete/{{file}}">delete</a>
-        <a href="/files/summary/{{file}}">summary</a>
-    </p>
-    {% endfor %}
+    <div class="reveal" id="rename-modal" data-reveal>
+        <button class="close-button" data-close aria-label="Close modal" type="button">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        <p>rename panel</p>
+        <form action="">
+            <label for="">
+                <input type="text" name="" id="">
+            </label>
+            <input type="submit" value="rename" class="button">
+        </form>
+    </div>
 {% endblock %}

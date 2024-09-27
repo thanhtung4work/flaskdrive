@@ -2,12 +2,14 @@ import os
 
 from flask import Flask
 from flask_cors import CORS
-
+from prometheus_flask_exporter import PrometheusMetrics
 
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
     CORS(app)
+    PrometheusMetrics(app)
+    
     app.config.from_mapping(
         SECRET_KEY='dev',
         DATABASE=os.path.join(app.instance_path, 'flaskdrive.sqlite'),

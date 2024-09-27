@@ -1,0 +1,13 @@
+services:
+  flaskdrive:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports: 
+      - "5000:5000"
+    volumes:
+      - ./server/static/user:/app/server/static/user
+    environment:
+      - FLASK_ENV=production
+    depends_on:
+      - prometheus

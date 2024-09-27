@@ -3,11 +3,15 @@ import os
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for, session, current_app
 )
+from pypdf import PdfReader
+from transformers import pipeline
 
 from server.auth import login_required
 from server.db import get_db
 
+
 bp = Blueprint('files', __name__, url_prefix='/files')
+summarizer = pipeline('summarization', model="Falconsai/text_summarization")
 
 
 @login_required
@@ -28,7 +32,7 @@ def upload():
     if os.path.exists(user_dir):
         file.save(os.path.join(user_dir, file.filename))
         return redirect(url_for('files.index'))
-    flash('upload failed')
+    flash('upload failed', 'error')
     return redirect(url_for('files.index'))
 
 
@@ -40,7 +44,7 @@ def delete(filename):
     ):
         os.remove(os.path.join(get_user_folder(), filename))
         return redirect(url_for('files.index'))
-    flash('cannot delete file, try later')
+    flash('cannot delete file, try later', 'error')
     return redirect(url_for('files.index'))
 
 
@@ -50,9 +54,16 @@ def summary(filename):
     if os.path.exists(
         os.path.join(get_user_folder(), filename)
     ):
-        flash('summary content go here')
+        text = ""
+        reader = PdfReader(os.path.join('server', 'static', current_app.config['ROOT_DIR'], g.user['username'], filename))
+        for page in reader.pages:
+            text += page.extract_text()
+            break
+        
+        summarized_text = summarizer(text, max_length=264, min_length=30, do_sample=False)[0]['summary_text']
+        flash(f'{filename} summary: {summarized_text}', 'info')
         return redirect(url_for('files.index'))
-    flash('cannot summary')
+    flash('cannot summary', 'error')
     return redirect(url_for('files.index'))
 
 

@@ -3,33 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='foundation_css/css/foundation.css') }}">
     <title>flaskdrive app</title>
 </head>
 <body>
-    <nav>
-        <h1>flaskdrive</h1>
-        <ul>
-          {% if g.user %}
-            <li><span>{{ g.user['username'] }}</span></li>
+    <nav class="top-bar">
+        <div class="top-bar-left">
+          <ul class="dropdown menu">
+            <li class="menu-text">flaskdrive</li>
+            {% if g.user %}
             <li><a href="{{ url_for('files.index') }}">Home</a></li>
             <li><a href="{{ url_for('auth.logout') }}">Log Out</a></li>
-          {% else %}
-            <li><a href="{{ url_for('auth.register') }}">Register</a>
-            <li><a href="{{ url_for('auth.login') }}">Log In</a>
-          {% endif %}
-        </ul>
+            {% else %}
+            <li><a href="{{ url_for('auth.register') }}">Register</a></li>
+            <li><a href="{{ url_for('auth.login') }}">Log In</a></li>
+            {% endif %}
+          </ul>
+        </div>
+
+        {% if g.user %}
+        <div class="top-bar-right">
+          <ul class="menu">
+            <li><a class="button">{{ g.user['username'] }}</a></li>
+          </ul>
+        </div>
+        {% endif %}
     </nav>
-    <section class="content">
-        {% for message in get_flashed_messages() %}
+    <section class="grid-container">
+        {% for message in get_flashed_messages(category_filter=['error']) %}
             <div class="flash">{{ message }}</div>
         {% endfor %}
         <header>
           {% block header %}{% endblock %}
         </header>
-        {% for message in get_flashed_messages() %}
-          <div class="flash">{{ message }}</div>
+        
+        {% for message in get_flashed_messages(category_filter=['info']) %}
+        <div class="flash">{{ message }}</div>
         {% endfor %}
+        
         {% block content %}{% endblock %}
       </section>
+
+      <script src="{{ url_for('static', filename='foundation_css/js/vendor/jquery.js') }}"></script>
+      <script src="{{ url_for('static', filename='foundation_css/js/vendor/what-input.js') }}"></script>
+      <script src="{{ url_for('static', filename='foundation_css/js/vendor/foundation.min.js') }}"></script>
+      <script>
+        $(document).foundation();
+      </script>
 </body>
 </html>
