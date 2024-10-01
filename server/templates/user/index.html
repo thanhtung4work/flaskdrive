@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>user information</h1>
+{% endblock %}
+
+{% block content %}
+<div class="grid-container">
+    <div class="grid-x">
+        <div class="grid-container cell small-4">
+            Lorem ipsum dolor sit, amet consectetur adipisicing elit. Id, voluptatum reprehenderit accusamus veniam veritatis cupiditate eius doloremque quos fugiat quas voluptate magnam eos inventore delectus accusantium modi at officia cum.
+        </div>
+        <div class="grid-container cell small-8">
+            {{data[0]}}
+        </div>
+    </div>
+</div>
+{% endblock %}
