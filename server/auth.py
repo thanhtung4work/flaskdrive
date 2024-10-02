@@ -4,12 +4,13 @@ import os
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for, current_app
 )
+from minio import Minio
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from server.db import get_db
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
-
+client = Minio("172.16.87.78:9000", "BSEPODhrOEBLStG0ayH3", "VGK8itE1lrN4AB6IDRyYNwnzxWd75dPToRzyfEn1", secure=False)
 
 @bp.route('/register', methods=['GET', 'POST'])
 def register():
@@ -37,7 +38,11 @@ def register():
             )
             db.commit()
             user_folder = os.path.join('server', 'static', current_app.config['ROOT_DIR'], username)
-            os.mkdir(user_folder)
+            
+            # os.mkdir(user_folder)
+            client.make_bucket(username)
+
+
         except Exception as er:
             error = f'User {username} is already registered.'
         else:

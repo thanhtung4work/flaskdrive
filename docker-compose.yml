@@ -9,5 +9,5 @@ services:
       - ./server/static/user:/app/server/static/user
     environment:
       - FLASK_ENV=production
-    depends_on:
-      - prometheus
+    # depends_on:
+    #   - prometheus
