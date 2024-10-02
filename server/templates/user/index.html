@@ -5,14 +5,37 @@
 {% endblock %}
 
 {% block content %}
-<div class="grid-container">
-    <div class="grid-x">
-        <div class="grid-container cell small-4">
-            Lorem ipsum dolor sit, amet consectetur adipisicing elit. Id, voluptatum reprehenderit accusamus veniam veritatis cupiditate eius doloremque quos fugiat quas voluptate magnam eos inventore delectus accusantium modi at officia cum.
+<div>
+    <form action="">
+        <div class="field">
+            <label for="username" class="label">Username</label>
+            <div class="control">
+                <input type="text" class="input disabled" value="{{data[1]}}" disabled>
+            </div>
         </div>
-        <div class="grid-container cell small-8">
-            {{data[0]}}
+        <div class="field">
+            <label for="oldpassword" class="label">Old password</label>
+            <div class="control">
+                <input type="password" class="input">
+            </div>
         </div>
-    </div>
+        <div class="field">
+            <label for="newpassword" class="label">New password</label>
+            <div class="control">
+                <input type="password" class="input">
+            </div>
+        </div>
+        <div class="field">
+            <label for="repeatpassword" class="label">Repeat password</label>
+            <div class="control">
+                <input type="password" class="input">
+            </div>
+        </div>
+        <div class="field">
+            <div class="control">
+                <button class="button" type="submit">Submit</button>
+            </div>
+        </div>
+    </form>
 </div>
 {% endblock %}

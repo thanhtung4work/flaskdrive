@@ -42,7 +42,15 @@
   </nav>
   <section class="container is-fluid">
     {% for message in get_flashed_messages(category_filter=['error']) %}
-    <div class="flash">{{ message }}</div>
+    <div class="message is-warning">
+      <div class="message-header">
+        <p>Error</p>
+        <button class="delete"></button>
+      </div>
+      <div class="message-body">
+        {{ message }}
+      </div>
+    </div>
     {% endfor %}
     
     <header class="is-size-3">
@@ -50,7 +58,11 @@
     </header>
 
     {% for message in get_flashed_messages(category_filter=['info']) %}
-    <div class="flash">{{ message }}</div>
+    <div class="message">
+      <div class="message-body">
+        {{ message }}
+      </div>
+    </div>
     {% endfor %}
 
     {% block content %}{% endblock %}
