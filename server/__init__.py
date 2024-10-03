@@ -1,4 +1,5 @@
 import os
+os.environ['HTTP_PROXY'] = "http://192.168.100.210:3128"
 
 from flask import Flask
 from flask_cors import CORS

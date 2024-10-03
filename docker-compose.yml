@@ -1,13 +1,21 @@
 services:
-  flaskdrive:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports: 
-      - "5000:5000"
+  minio:
+    image: minio/minio
+    container_name: flaskdrive_minio
+    hostname: flaskdrive_minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
     volumes:
-      - ./server/static/user:/app/server/static/user
+      - ./storage:/data
     environment:
-      - FLASK_ENV=production
-    # depends_on:
-    #   - prometheus
+      MINIO_ROOT_USER: tungt_minio
+      MINIO_ROOT_PASSWORD: minio_password
+    command: server --console-address ":9001" /data
+  
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"

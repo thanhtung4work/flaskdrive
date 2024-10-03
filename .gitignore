@@ -162,3 +162,9 @@ cython_debug/
 #.idea/
 
 users/
+
+# HF_HOME
+cache/
+
+# Minio storage
+storage/

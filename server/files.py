@@ -1,5 +1,7 @@
 import io
 import os
+os.environ['HTTP_PROXY'] = "http://192.168.100.210:3128"
+os.environ['HF_HOME'] = './cache/'
 
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for, current_app, send_from_directory, send_file
@@ -13,7 +15,15 @@ from server.auth import login_required
 
 bp = Blueprint('files', __name__, url_prefix='/files')
 summarizer = pipeline('summarization', model="Falconsai/text_summarization")
-client = Minio("172.16.87.78:9000", "BSEPODhrOEBLStG0ayH3", "VGK8itE1lrN4AB6IDRyYNwnzxWd75dPToRzyfEn1", secure=False)
+
+ACCESS_KEY = os.environ.get("ACCESS_KEY")
+SECRET_KEY = os.environ.get("SECRET_KEY")
+MINIO_ENDPOINT = os.environ.get("MINIO_ENDPOINT")
+
+print(MINIO_ENDPOINT, ACCESS_KEY, SECRET_KEY)
+
+client = Minio(MINIO_ENDPOINT, ACCESS_KEY, SECRET_KEY, secure=False)
+# client = Minio("172.16.87.78:9000", "iPdKcoWd5HxqQbi3oXgR", "Ckvx23r2hgYlSclNysgXT3W1IuACeT62qM1nETM6", secure=False)
 
 
 @login_required
@@ -26,6 +36,8 @@ def get_user_folder(include_app=True):
 @login_required
 def index():
     # files = os.listdir(get_user_folder())
+    if not client.bucket_exists(g.user['username']):
+        client.make_bucket(g.user['username'])
     files = client.list_objects(g.user['username'])
     return render_template('files/index.html', data=[file.object_name for file in files])
 
@@ -128,6 +140,8 @@ def rename(filename):
 @bp.route('/download/<filename>', methods=['GET'])
 @login_required
 def download(filename):
-    user_dir = get_user_folder(include_app=False)
-    print(user_dir, filename)
-    return send_from_directory(user_dir, filename, as_attachment=True)
+    # user_dir = get_user_folder(include_app=False)
+    # print(user_dir, filename)
+    # return send_from_directory(user_dir, filename, as_attachment=True)
+    response = client.get_object(g.user['username'], filename)
+    return send_file(io.BytesIO(response.data), download_name=filename)

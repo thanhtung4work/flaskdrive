@@ -10,7 +10,13 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from server.db import get_db
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
-client = Minio("172.16.87.78:9000", "BSEPODhrOEBLStG0ayH3", "VGK8itE1lrN4AB6IDRyYNwnzxWd75dPToRzyfEn1", secure=False)
+
+ACCESS_KEY = os.environ.get("ACCESS_KEY")
+SECRET_KEY = os.environ.get("SECRET_KEY")
+MINIO_ENDPOINT = os.environ.get("MINIO_ENDPOINT")
+
+# client = Minio("172.16.87.78:9000", "iPdKcoWd5HxqQbi3oXgR", "Ckvx23r2hgYlSclNysgXT3W1IuACeT62qM1nETM6", secure=False)
+client = Minio(MINIO_ENDPOINT, ACCESS_KEY, SECRET_KEY, secure=False)
 
 @bp.route('/register', methods=['GET', 'POST'])
 def register():
